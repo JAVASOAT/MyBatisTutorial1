@@ -49,9 +49,9 @@ public class MybatisDaoTest extends TestCase {
 		book.setIsbn("784-4564");
 		book.setAuthor(author);
 		book.setImageName("");
-		book.setTitle("l'obscurité");
-		book.setShortDescription("un ouvrage qui traite le sujet de l'obscurité");
-		book.setLongDescription("un ouvrage qui traite le sujet de l'obscurité, c'est long, sombre, ennuyeux à mourir, une vraie perte de temps");
+		book.setTitle("l'obscuritÃ©");
+		book.setShortDescription("un ouvrage qui traite le sujet de l'obscuritÃ©");
+		book.setLongDescription("un ouvrage qui traite le sujet de l'obscuritÃ©, c'est long, sombre, ennuyeux Ã  mourir, une vraie perte de temps");
 		
 	}
 	

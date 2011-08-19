@@ -40,7 +40,7 @@ public class InitDatabase {
 		b.setTitle("Nana");
 		b.setIsbn("547E45");
 		b.setShortDescription("Un ouvrage de Zola");
-		b.setLongDescription("Un très long ouvrage écrit par Zola");
+		b.setLongDescription("Un trÃ¨s long ouvrage Ã©crit par Zola");
 		b.setAuthor(zola);
 		b.addCategory(roman);
 		session.insert("insertBook", b);
@@ -50,7 +50,7 @@ public class InitDatabase {
 		b.setTitle("Germinal");
 		b.setIsbn("874F98");
 		b.setShortDescription("Un autre ouvrage de Zola");
-		b.setLongDescription("Une histoire toujorus aussi longue écrite par Zola");
+		b.setLongDescription("Une histoire toujorus aussi longue Ã©crite par Zola");
 		b.setAuthor(zola);
 		b.addCategory(nouvelle);
 		session.insert("insertBook", b);
@@ -59,7 +59,7 @@ public class InitDatabase {
 		b=new Book();
 		b.setTitle("Harry Potter");
 		b.setIsbn("8647SW54");
-		b.setShortDescription("On ne présente plus Harry");
+		b.setShortDescription("On ne prÃ©sente plus Harry");
 		b.setLongDescription("Les aventures de Harry le magicien, en 7 ou 8 tomes");
 		b.setAuthor(jkrowling);
 		b.addCategory(roman);
