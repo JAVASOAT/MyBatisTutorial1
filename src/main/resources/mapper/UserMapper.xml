@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+
+<mapper namespace="com.soat.dao.mybatis.mapper.UserMapper">
+
+	<select id="selectUser" parameterType="int" resultType="User">
+		SELECT *
+		FROM user WHERE id_user = #{id}
+	</select>
+	
+	<select id="selectAllUsers" resultType="User">
+		SELECT id_user as id, name, firstname, email, password
+		FROM user
+	</select>
+	
+	
+	<insert id="insertUser" parameterType="User" keyProperty="id">
+		INSERT INTO user(name, firstname, email, password)
+		VALUES(#{name}, #{firstname}, #{email}, #{password})
+	</insert>
+	
+	
+	<insert id="insertUserList" parameterType="Param">
+		INSERT INTO user(name, firstname, email, password)
+		VALUES
+		<foreach collection="users" item="user" open="" close="" separator=",">
+			(#{user.name}, #{user.firstname}, #{user.email}, #{user.password})
+		</foreach>
+	</insert>
+		
+</mapper>

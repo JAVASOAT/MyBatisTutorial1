@@ -1,0 +1,195 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+
+<mapper namespace="com.soat.dao.mybatis.mapper.BookMapper">
+
+	<resultMap type="Book" id="bookResultMap">
+		<id property="id" column="id_book" />
+		<result property="isbn" column="isbn" />
+		<result property="title" column="title" />		
+		<result property="imageName" column="image_name" />
+		<result property="shortDescription" column="short_description" />
+		<result property="longDescription" column="long_description" />
+	</resultMap>
+
+	<sql id="selectBook">
+		SELECT
+		b.id_book AS id,
+		b.isbn,
+		b.title,
+		b.short_description AS shortDescription,
+		b.long_description AS longDescription,
+		b.image_name AS imageName
+		FROM book b
+	</sql>
+
+	<select id="selectAllBooks" resultType="Book">
+		<include refid="selectBook"/>
+	</select>
+	
+	
+	<select id="selectBookById" parameterType="int" resultType="Book">
+		<include refid="selectBook"/> 
+		WHERE b.id_book = #{id}
+	</select>
+
+	<select id="selectBookByCategory" parameterType="int" resultType="Book">
+		<include refid="selectBook"/>
+		JOIN category_book cb ON b.id_book = cb.id_book
+		WHERE cb.id_category = #{id}		
+	</select>
+
+	<select id="selectBookByKeyWord" parameterType="string" resultType="Book">	
+		<include refid="selectBook"/>
+		WHERE isbn LIKE CONCAT('%', #{word},'%')
+		OR title LIKE CONCAT('%', #{word},'%')
+		OR long_description LIKE CONCAT('%', #{word},'%')		    		
+	</select>
+
+	<insert id="insertBook" parameterType="Book" keyProperty="id">
+		INSERT INTO book(
+			isbn, title, 
+			short_description, long_description, image_name
+			<if test="author != null">, id_author</if>
+		)VALUES(
+			#{isbn}, #{title}, 
+			#{shortDescription}, #{longDescription}, #{imageName}
+			<if  test="author != null" >, #{author.id}</if>
+		)
+	</insert>
+
+	<update id="updateBook" parameterType="Book">
+		UPDATE book SET
+			isbn = #{isbn},
+			title = #{title},			
+			short_description = #{shortDescription},
+			long_description = #{longDescription},
+			image_name = #{imageName}
+			<if test="author != null">, id_author = #{author.id}</if>
+		WHERE id_book = #{id}
+	</update>
+
+	<delete id="deleteBook" parameterType="Book">
+		DELETE FROM book 
+		WHERE id_book = #{id}
+	</delete>
+		
+	<update id="helloProcedure" statementType="CALLABLE" 
+		parameterType="Param">
+		{CALL helloProcedure(
+			#{name, mode=IN, jdbcType=VARCHAR},
+	       	#{message, mode=OUT, jdbcType=VARCHAR}        
+			)
+		}
+	</update>
+		
+	<select id="helloFunction" parameterType="map" resultType="string">
+		SELECT helloFunction(#{name}) AS message
+	</select>
+	
+	<update id="helloFunctionProc" statementType="CALLABLE" 
+		parameterType="Param">
+		{ #{message,jdbcType=VARCHAR,mode=OUT} = CALL helloFunction( 
+			#{name,jdbcType=VARCHAR,mode=IN} 
+		) }
+	</update>
+	
+	<resultMap type="Category" id="categoryResultMap" >
+		<id property="id" column="id_category" />
+		<result property="name" column="name_category" />
+	</resultMap>
+	
+	<resultMap type="Author" id="authorResultMap" >
+		<id property="id" column="id_author" />
+		<result property="name" column="name_author" />
+	</resultMap>
+	
+	<resultMap type="Book" id="greedyBook" extends="bookResultMap">
+		<association property="author" javaType="Author" resultMap="authorResultMap" />
+		<collection property="categories" ofType="Category" resultMap="categoryResultMap" />
+	</resultMap>
+	
+	<select id="selectBookAndCategoryGreedy" resultMap="greedyBook" parameterType="int">
+		SELECT
+		b.id_book,
+		b.isbn,
+		b.title,
+		b.short_description,
+		b.long_description,
+		b.image_name,	
+		c.id_category,
+		c.name_category,
+		a.id_author,
+		a.name_author
+		FROM book b
+		LEFT OUTER JOIN category_book cb ON b.id_book = cb.id_book
+		LEFT OUTER JOIN category c ON cb.id_category = c.id_category
+		LEFT OUTER JOIN author a ON b.id_author = a.id_author			
+	</select>
+		
+	<select id="selectAuthorById" parameterType="int" resultType="Author">
+		SELECT 
+			a.id_author AS id, 
+			a.name_author AS name 
+		FROM author a
+		WHERE a.id_author = #{id}
+	</select>
+	
+	
+	<resultMap type="Book" id="lazyBook" extends="bookResultMap">
+		<association property="author" column="id_author" javaType="Author" select="selectAuthorById" />
+		<collection property="categories" column="id_book" ofType="Category" select="selectCategoryByBookId" />
+	</resultMap>
+		
+	<select id="selectCategoryByBookId" parameterType="int" resultType="Category">
+		SELECT 
+			c.id_category AS id, 
+			c.name_category AS name 
+		FROM category c JOIN category_book cb ON c.id_category = cb.id_category
+		WHERE cb.id_book = #{id}
+	</select>
+	
+	<select id="selectLazyBook" resultMap="lazyBook" parameterType="int">
+		SELECT
+		b.id_book,
+		b.isbn,
+		b.title,
+		b.short_description,
+		b.long_description,
+		b.image_name,
+		b.id_author
+		FROM book b
+		<where>
+			<if test="value != null">
+				b.id_book = #{value}
+			</if>
+		</where>	
+	</select>
+	
+	
+	<select id="selectAllCategories" resultType="Category">
+		SELECT 
+			c.id_category AS id, 
+			c.name_category AS name 
+		FROM category c
+	</select>
+	
+	<delete id="deleteBookCategories" parameterType="Book">
+		DELETE FROM category_book WHERE id_book = #{id}
+	</delete>
+	
+	<insert id="insertBookCategories" parameterType="Book">
+		INSERT INTO category_book(
+		id_book,
+		id_category
+		)VALUES
+		<foreach collection="categories" item="cat" open="" close="" separator=",">
+			(#{id}, #{cat.id})
+		</foreach>
+	</insert>
+	
+	
+</mapper>
